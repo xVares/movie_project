@@ -1,5 +1,6 @@
 # API_key
 data/api_key.json
+istorage.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
