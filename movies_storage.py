@@ -123,7 +123,7 @@ def movie_add(dict_of_movie_dicts, url, api_key):
 
     except requests.exceptions.ConnectionError as e:
         print(f"There was a connection Error. Please check your internet connection \n"
-              f"You can still use the other menu commands while having no internet \n"
+              f"You can still use other menu commands while having no internet connection \n"
               f"Further error details: {e} \n")
 
 

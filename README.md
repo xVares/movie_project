@@ -53,7 +53,7 @@ Before running the project, make sure to set up the API key. Follow these steps:
 }
 ```
 
-3. Replace `YOUR_API_KEY` with your actual API key between the quotation marks for accessing movie data.
+3. Replace `YOUR_API_KEY` with your actual API key inbetween the quotation marks to fetch movie data.
 
 ## Usage
 
@@ -76,7 +76,7 @@ number. The available menu options are:
 8. **Movies sorted by rating**: Sort and display the movies in the database by rating.
 9. **Generate Website**: Generate a website using the movie data and a provided template.
 
-To exit the application, choose the "Exit" option from the menu.
+To exit the application, choose the "Exit" option from the menu by entering `0`.
 
 ## Data Storage
 

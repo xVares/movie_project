@@ -12,19 +12,24 @@ def main():
     """
     Entry point of application
 
-    - Using a list of movies as database, each movie is a dictionary:
-        [
-          {
-            "title": "...", # string
-            "rating": ...,  # float
-            "year": ...     # int
-          },
-          {
-            "title": "...", # string
-            "rating": ...,  # float
-            "year": ...     # int
-          }
-        ]
+    - Using a dictionary of movies as database, each movie is a dictionary:
+        {
+            "Title": {
+                "rating": "...",
+                "year": "...",
+                "poster": "..."
+            },
+            "Title": {
+                "rating": "...",
+                "year": "...",
+                "poster": "..."
+            },
+            "Title": {
+                "rating": "...",
+                "year": "...",
+                "poster": "..."
+            }
+        }
 
     - The menu has 9 entries and will be displayed as follows:
         0. Exit
@@ -65,7 +70,9 @@ def main():
         user_choice = menu.show_menu_return_user_choice()
 
         try:
-            if not isinstance(user_choice, int) or user_choice < 0 or user_choice > 9:
+            correct_input = isinstance(user_choice, int) or user_choice < 0 or user_choice > 9
+
+            if not correct_input:
                 raise ValueError
 
             action = choice_actions.get(user_choice)
