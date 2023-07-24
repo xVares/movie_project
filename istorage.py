@@ -70,16 +70,15 @@ class IStorage(ABC):
         """
 
     @abstractmethod
-    def add_movie(self, url, api_key):
+    def add_movie(self):
         """Add a movie to the storage system.
 
         Args:
             url (str): URL to make a fetch request (OMDb).
-            api_key (str): API key to make a fetch request.
         """
 
     @abstractmethod
-    def delete_movie(self, title):
+    def delete_movie(self):
         """Delete a movie from the storage system.
 
         Args:
@@ -87,10 +86,9 @@ class IStorage(ABC):
         """
 
     @abstractmethod
-    def update_movie(self, title, notes):
+    def update_movie(self, notes):
         """Update the notes for a movie in the storage system.
 
         Args:
-            title (str): The title of the movie to be updated.
             notes (str): The updated notes for the movie.
         """

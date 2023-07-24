@@ -5,23 +5,22 @@ from istorage import IStorage
 
 
 class StorageJson(IStorage):
-    def __init__(self, file_path="data/movies_data.json"):
+    def __init__(self, file_path):
         """
         Constructor of class StorageJson. Constructs following instance variables:
-            name (str): The name of the product.
-            price (int): The price of the product.
-            quantity (int): The quantity of the product.
-            active (bool): The activation status of the product.
-            promotion (obj): The Promotion obj of the product.
-            maximum ()
+            API_KEY (str): API key to make a fetch request.
+            file_path (str): file path of movie database JSON.
+            movies_dict (dict): Parsed movie database JSON.
         """
+        self.API_KEY = self.parse_json("data/api_key.json")["api_key"]
+        self.MOVIE_DATA_URL = f"http://www.omdbapi.com/?apikey={self.API_KEY}&"
         self.file_path = file_path
         self.movies_dict = self.parse_json(self.file_path)
 
     def list_movies(self):
-        """List all the movies in the dictionary of movie dictionaries."""
-        # Iterate over the dictionary and display movie details
+        """List all the movies in movie_dict."""
         print(f"\n{len(self.movies_dict)} movies in total:")
+        # Iterate over the dictionary and display movie details
         for movie_title, movie_data in self.movies_dict.items():
             print(f"---------------------------------\n"
                   f"Title: {movie_title}")
@@ -32,20 +31,20 @@ class StorageJson(IStorage):
                     print(f"{key}: {val}")
             time.sleep(0.8)
 
-    def add_movie(self, url, api_key):
+    def add_movie(self):
         """
-           - Add a new movie with its name and rating to the database
-           - Return the modified database
-           """
+        - Add a new movie with its name and rating to the database
+        - Modify JSON by adding new movie to database
+        """
         # fetch data and parse it from database
         try:
             user_movie_title_input = input("Enter new movie name: ")
-            new_movie_data = self.fetch_data(url, api_key, {"t": user_movie_title_input})
-            successful_fetch = self.fetching_successful(new_movie_data["Response"])
+            new_movie_data = self.fetch_data(self.MOVIE_DATA_URL, self.API_KEY,
+                                             {"t": user_movie_title_input})
+            fetch_successful = self.fetching_successful(new_movie_data["Response"])
 
-            if not successful_fetch:
-                print("We couldn't find the movie you were searching for")
-                return self.movies_dict
+            if not fetch_successful:
+                raise RuntimeError
 
             new_movie_title = new_movie_data["Title"]
             new_movie_rating = new_movie_data["imdbRating"]
@@ -67,31 +66,31 @@ class StorageJson(IStorage):
                     "poster": new_movie_poster
                 }
                 self.movies_dict[new_movie_title] = new_movie
+                self.modify_json("data/movies_data.json", self.movies_dict)
                 print(f"{new_movie_title} was successfully added to the list")
-            return self.movies_dict
+
+        except RuntimeError:
+            print("We couldn't find the movie you were searching for")
 
         except requests.exceptions.ConnectionError as e:
             print(f"There was a connection Error. Please check your internet connection \n"
                   f"You can still use other menu commands while having no internet connection \n"
                   f"Further error details: {e} \n")
 
-    def delete_movie(self, title):
-        """
-        - Get user input for movie name and delete the movie if it exists in the database
-        - Return the modified database.
-        """
+    def delete_movie(self):
+        """Get input for movie name and delete movie if it exists in the database"""
         movie_name = input("Enter movie name to delete: ").title()
 
         # check if movie is in database and delete it
         if movie_name in self.movies_dict:
             del self.movies_dict[movie_name]
+            self.modify_json("data/movies_data.json", self.movies_dict)
             print(f"{movie_name} was successfully deleted!")
+
         else:
             print(f"{movie_name} is not on the list\n")
 
-        return self.movies_dict
-
-    def update_movie(self, title, notes):
+    def update_movie(self, notes):
         """
         - get user input:
             - movie name:         # string
@@ -108,8 +107,9 @@ class StorageJson(IStorage):
 
         if movie_in_database:
             new_movie_rating = float(input(f"Enter a new rating for {movie_name}: "))
+
             self.movies_dict[movie_name]["rating"] = new_movie_rating
+            self.modify_json("data/movies_data.json", self.movies_dict)
             print(f"The rating of {movie_name} was successfully updated to {new_movie_rating}")
         else:
             print("This movie doesn't exist in the data base, please try again")
-        return self.movies_dict
