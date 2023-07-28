@@ -1,14 +1,11 @@
-import json
-import time
-
-import requests
-
 from abc import ABC, abstractmethod
+import json
+import requests
 
 
 class IStorage(ABC):
     @staticmethod
-    def fetch_data(request_url, api_key, params):
+    def fetch_data(fetch_url, params):
         """
         - Fetches data from the specified URL using the provided API key and parameters.
 
@@ -37,58 +34,55 @@ class IStorage(ABC):
         }
     }
         """
-        correct_url = f"{request_url}{api_key}"
-        res = requests.get(correct_url, params=params)
+        res = requests.get(fetch_url, params=params)
         return res.json()
 
     @staticmethod
     def fetching_successful(response):
-        """check if fetching was successful based on response value"""
+        """
+        Check if fetching was successful based on response value and return Boolean
+        """
         if response == "True":
             return True
         return False
 
     @staticmethod
     def parse_json(file):
-        """Parse json file in to python object and load it."""
+        """
+        Parse JSON file in to python object and return it.
+        """
         with open(file, "r") as f:
             return json.load(f)
 
     @staticmethod
     def modify_json(file, data):
-        """Save modified data to file."""
+        """
+        Save modified data to file.
+        """
         with open(file, "w") as f:
             json.dump(data, f)
 
     # abstract methods
     @abstractmethod
     def list_movies(self):
-        """Retrieve a list of movies stored in the storage system.
-
-        Returns:
-            list: A list of movie objects.
+        """
+        Prints every movie in the database
         """
 
     @abstractmethod
     def add_movie(self):
-        """Add a movie to the storage system.
-
-        Args:
-            url (str): URL to make a fetch request (OMDb).
+        """
+        Add a movie to the storage system.
         """
 
     @abstractmethod
     def delete_movie(self):
-        """Delete a movie from the storage system.
-
-        Args:
-            title (str): The title of the movie to be deleted.
+        """
+        Delete a movie from the storage system.
         """
 
     @abstractmethod
-    def update_movie(self, notes):
-        """Update the notes for a movie in the storage system.
-
-        Args:
-            notes (str): The updated notes for the movie.
+    def update_movie(self):
+        """
+        Update the movie manually.
         """

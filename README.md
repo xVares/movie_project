@@ -53,7 +53,7 @@ Before running the project, make sure to set up the API key. Follow these steps:
 }
 ```
 
-3. Replace `YOUR_API_KEY` with your actual API key inbetween the quotation marks to fetch movie data.
+3. Replace `YOUR_API_KEY` with your actual API key inside the quotation marks to fetch movie data.
 
 ## Usage
 
@@ -80,5 +80,6 @@ To exit the application, choose the "Exit" option from the menu by entering `0`.
 
 ## Data Storage
 
-The movie data is stored in a JSON file named `movies_data.json` inside the `data` directory. You can modify this file
-directly or use the application's menu options to add, delete, and update movies.
+The movie data is stored in the `data` directory either as a JSON file named `movies_data.json` or as a CSV file
+named `movies_data.csv`. You can modify this file directly or use the application's menu options to add, delete, and
+update movies.
