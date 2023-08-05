@@ -5,39 +5,6 @@ import requests
 
 class IStorage(ABC):
     @staticmethod
-    def fetch_data(fetch_url, params):
-        """
-        - Fetches data from the specified URL using the provided API key and parameters.
-
-        - Parameters:
-            - request_url (str): The URL to fetch data from.
-            - api_key (str): The API key to authenticate the request.
-            - params (dict): A dictionary of parameters to include in the request.
-
-        - Returns: a dictionary of movie dictionaries. All key-value pairs are str:
-
-    {
-        "Title": {
-            "rating": "...",
-            "year": "...",
-            "poster": "..."
-        },
-        "Title": {
-            "rating": "...",
-            "year": "...",
-            "poster": "..."
-        },
-        "Title": {
-            "rating": "...",
-            "year": "...",
-            "poster": "..."
-        }
-    }
-        """
-        res = requests.get(fetch_url, params=params)
-        return res.json()
-
-    @staticmethod
     def fetching_successful(response):
         """
         Check if fetching was successful based on response value and return Boolean
@@ -47,20 +14,20 @@ class IStorage(ABC):
         return False
 
     @staticmethod
+    def modify_json(file_path, data):
+        """
+        Save modified data to file.
+        """
+        with open(file_path, "w") as f:
+            json.dump(data, f)
+
+    @staticmethod
     def parse_json(file):
         """
         Parse JSON file in to python object and return it.
         """
         with open(file, "r") as f:
             return json.load(f)
-
-    @staticmethod
-    def modify_json(file, data):
-        """
-        Save modified data to file.
-        """
-        with open(file, "w") as f:
-            json.dump(data, f)
 
     # abstract methods
     @abstractmethod
@@ -70,7 +37,7 @@ class IStorage(ABC):
         """
 
     @abstractmethod
-    def add_movie(self):
+    def add_movie(self, movie_title, movie_data, fetch_successful):
         """
         Add a movie to the storage system.
         """

@@ -1,8 +1,9 @@
 # local project files
 data/api_key.json
 _static/index.html
-to-dos.md
 test.py
+data/movies_data_backup.csv
+data/movies_data_backup.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

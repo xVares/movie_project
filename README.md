@@ -63,8 +63,14 @@ To start the application, run the following command:
 python main.py
 ```
 
-The application will display a menu with various options. Choose the desired option by entering the corresponding
-number. The available menu options are:
+Before the menu options appear, the user will be asked to choose between the storage options. Currently, there are two
+storage options available:
+
+1. **JSON**: The application will store and retrieve movie data using JSON files.
+2. **CSV**: The application will store and retrieve movie data using CSV files.
+
+Once the user selects the storage option, the menu will be displayed, and they can choose the desired option by entering
+the corresponding number. The available menu options are:
 
 1. **List movies**: Display the list of movies in the database.
 2. **Add movie**: Add a new movie to the database by providing movie details.

@@ -1,5 +1,7 @@
 import random
 import statistics
+import time
+import requests
 
 
 class MovieApp:
@@ -11,6 +13,40 @@ class MovieApp:
             movie_storage (class): An object of a class inheriting from IStorage.
         """
         self._storage = movie_storage
+        self.API_KEY = self._storage.parse_json("data/api_key.json")["api_key"]
+        self.FETCH_MOVIE_URL = f"http://www.omdbapi.com/?apikey={self.API_KEY}&"
+
+    def fetch_data(self, movie):
+        """
+        - Fetches data from the specified URL using the provided API key and parameters.
+
+        - Parameters:
+            - request_url (str): The URL to fetch data from.
+            - api_key (str): The API key to authenticate the request.
+            - params (dict): A dictionary of parameters to include in the request.
+
+        - Returns: a dictionary of movie dictionaries. All key-value pairs are str:
+
+    {
+        "Title": {
+            "rating": "...",
+            "year": "...",
+            "poster": "..."
+        },
+        "Title": {
+            "rating": "...",
+            "year": "...",
+            "poster": "..."
+        },
+        "Title": {
+            "rating": "...",
+            "year": "...",
+            "poster": "..."
+        }
+    }
+        """
+        res = requests.get(self.FETCH_MOVIE_URL, params=movie)
+        return res.json()
 
     @staticmethod
     def show_menu_return_user_choice():
@@ -34,7 +70,7 @@ class MovieApp:
             "8. Movies sorted by rating\n"
             "9. Generate website\n"
             "\n"
-            "Enter choice (0-9): "))
+            "Enter you choice (0-9): "))
 
         return user_choice
 
@@ -42,7 +78,27 @@ class MovieApp:
         """
         Command to list all the movies in the movie storage.
         """
-        self._storage.list_movies()
+        movies = self._storage.list_movies()
+
+        print(f"\n{len(movies)} movies in total:")
+
+        # Iterate over the dictionary and display movie details
+        for movie_title, movie_data in movies.items():
+            print(f"---------------------------------\n"
+                  f"Title: {movie_title}")
+            for key, val in movie_data.items():
+                try:
+                    print(f"{key.capitalize()}: {val}")
+                except AttributeError:
+                    print(f"{key}: {val}")
+            time.sleep(0.8)
+
+    def _command_add_movie(self):
+        user_movie_title = input("Enter new movie name: ")
+        new_movie_data = self.fetch_data({"t": user_movie_title})
+        fetch_successful = self._storage.fetching_successful(new_movie_data["Response"])
+
+        self._storage.add_movie(user_movie_title, new_movie_data, fetch_successful)
 
     def _command_movie_stats(self):
         """
@@ -129,6 +185,7 @@ class MovieApp:
             best_movie_rating()
             worst_movie_rating()
 
+        # Call wrapper function to execute all stats methods
         movie_stats()
 
     def _command_movie_random(self):
@@ -138,30 +195,30 @@ class MovieApp:
         random_movie_title = random.choice(list(self._storage.movie_dict))
         random_movie_rating = self._storage.movie_dict[random_movie_title].get("rating")
         print(f"\n"
-              f"Your random movie: \n"
-              f"Title: {random_movie_title} \n"
-              f"Rating: {random_movie_rating} \n")
+              f"Your random movie:\n"
+              f"Title: {random_movie_title}\n"
+              f"Rating: {random_movie_rating}")
 
     def _command_search_movie(self):
         """
         Command to search for movies in the movie storage based on user input (search query).
         Function is case-insensitive.
         """
-        search_query = input("Search for a movie: ")
+        query = input("Search for a movie: ")
         found_movies = []
 
         for movie_title in self._storage.movie_dict.keys():
-            if search_query.lower() in movie_title.lower():
+            if query.lower() in movie_title.lower():
                 found_movies.append(movie_title)
 
         if found_movies:
             print(f"\n"
-                  f"We found these movies according to your query '{search_query}':")
+                  f"We found these movies according to your query '{query}':")
             for movie_title in found_movies:
                 print(f"{movie_title}: {self._storage.movie_dict[movie_title].get('rating')}")
         else:
             print(f"I'm sorry! We couldn't find any movies according to your search query "
-                  f"'{search_query}'.")
+                  f"'{query}'.")
 
     def _command_sort_movie(self):
         """
@@ -265,8 +322,8 @@ class MovieApp:
         # Create a dict mapping user choices to corresponding functions
         choice_actions = {
             0: lambda: print("Bye!"),
-            1: lambda: self._storage.list_movies(),
-            2: lambda: self._storage.add_movie(),
+            1: lambda: self._command_list_movies(),
+            2: lambda: self._command_add_movie(),
             3: lambda: self._storage.delete_movie(),
             4: lambda: self._storage.update_movie(),
             5: lambda: self._command_movie_stats(),
@@ -280,10 +337,6 @@ class MovieApp:
         while True:
             try:
                 user_choice = self.show_menu_return_user_choice()
-                correct_input = isinstance(user_choice, int) or user_choice < 0 or user_choice > 9
-
-                if not correct_input:
-                    raise ValueError
 
                 action = choice_actions.get(user_choice)
                 if action:

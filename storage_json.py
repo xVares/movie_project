@@ -1,6 +1,5 @@
-import json
 import requests
-import time
+import json
 
 from istorage import IStorage
 
@@ -20,39 +19,47 @@ class StorageJson(IStorage):
 
     def list_movies(self):
         """
-        List all the movies in the movie_dict.
-        """
-        print(f"\n{len(self.movie_dict)} movies in total:")
-        # Iterate over the dictionary and display movie details
-        for movie_title, movie_data in self.movie_dict.items():
-            print(f"---------------------------------\n"
-                  f"Title: {movie_title}")
-            for key, val in movie_data.items():
-                try:
-                    print(f"{key.capitalize()}: {val}")
-                except AttributeError:
-                    print(f"{key}: {val}")
-            time.sleep(0.8)
+        Returns a dictionary of dictionaries that
+        contains the movies information in the database.
 
-    def add_movie(self):
+        The function loads the information from the JSON
+        file and returns the data.
+
+        For example, the function may return:
+            {
+                "Title": {
+                    "rating": "...",
+                    "year": "...",
+                    "poster": "..."
+                },
+                "Title": {
+                    "rating": "...",
+                    "year": "...",
+                    "poster": "..."
+                },
+                "Title": {
+                    "rating": "...",
+                    "year": "...",
+                    "poster": "..."
+                }
+            }
+        """
+        return self.parse_json(self.file_path)
+
+    def add_movie(self, movie_title, movie_data, fetch_successful):
         """
         Add a new movie with its name, rating, and other details to the database.
         Modify the JSON by adding the new movie to the database.
         """
         # fetch data and parse it from database
         try:
-            fetch_url = f"{self.MOVIE_DATA_URL}{self.API_KEY}"
-            user_movie_title = input("Enter new movie name: ")
-            new_movie_data = self.fetch_data(fetch_url, {"t": user_movie_title})
-            fetch_successful = self.fetching_successful(new_movie_data["Response"])
-
             if not fetch_successful:
                 raise RuntimeError
 
-            new_movie_title = new_movie_data["Title"]
-            new_movie_rating = new_movie_data["imdbRating"]
-            new_movie_year = new_movie_data["Year"]
-            new_movie_poster = new_movie_data["Poster"]
+            new_movie_title = movie_data["Title"]
+            new_movie_rating = movie_data["imdbRating"]
+            new_movie_year = movie_data["Year"]
+            new_movie_poster = movie_data["Poster"]
 
             # check if movie is in database --> flag = True
             movie_in_database = False
@@ -69,7 +76,7 @@ class StorageJson(IStorage):
                     "poster": new_movie_poster
                 }
                 self.movie_dict[new_movie_title] = new_movie
-                self.modify_json("data/movie_dict.json", self.movie_dict)
+                self.modify_json(self.file_path, self.movie_dict)
                 print(f"{new_movie_title} was successfully added to the list")
 
         except RuntimeError:
@@ -89,7 +96,7 @@ class StorageJson(IStorage):
         # check if movie is in database and delete it
         if movie_name in self.movie_dict:
             del self.movie_dict[movie_name]
-            self.modify_json("data/movie_dict.json", self.movie_dict)
+            self.modify_json(self.file_path, self.movie_dict)
             print(f"{movie_name} was successfully deleted!")
 
         else:
@@ -111,7 +118,7 @@ class StorageJson(IStorage):
             new_movie_rating = float(input(f"Enter a new rating for {movie_name}: "))
 
             self.movie_dict[movie_name]["rating"] = new_movie_rating
-            self.modify_json("data/movie_dict.json", self.movie_dict)
+            self.modify_json("data/movies_data.json", self.movie_dict)
             print(f"The rating of {movie_name} was successfully updated to {new_movie_rating}")
         else:
             print("This movie doesn't exist in the data base, please try again")
